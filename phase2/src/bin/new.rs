@@ -2,7 +2,6 @@ extern crate rand;
 extern crate phase2;
 extern crate exitcode;
 
-use rand::ChaChaRng;
 use std::fs::File;
 
 fn main() {
@@ -13,10 +12,6 @@ fn main() {
     }
     let circuit_filename = &args[1];
     let params_filename = &args[2];
-
-    let mut rng = ChaChaRng::new_unseeded();
-    rng.set_counter(0u64, 1234567890u64);
-    let rng = &mut rng;
 
     // Import the circuit and create the initial parameters using phase 1
     println!("Creating initial parameters for {}...", circuit_filename);

@@ -10,25 +10,18 @@ extern crate itertools;
 
 use itertools::Itertools;
 
-// For randomness (during paramgen and proof generation)
-use rand::Rng;
-
-// For benchmarking
-use std::time::{Duration, Instant};
-use std::str;
-
 use std::fs::File;
 use std::fs::OpenOptions;
-use std::io::Write;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    if args.len() != 3 {
-        println!("Usage: \n<in_params.params> <in_str_entropy>");
+    if args.len() != 4 {
+        println!("Usage: \n<in_params.params> <in_str_entropy> <out_params.params>");
         std::process::exit(exitcode::USAGE);
     }
-    let params_filename = &args[1];
+    let in_params_filename = &args[1];
     let entropy = &args[2];
+    let out_params_filename = &args[3];
 
     // Create an RNG based on a mixture of system randomness and user provided randomness
     let mut rng = {
@@ -65,15 +58,15 @@ fn main() {
 
     let reader = OpenOptions::new()
                             .read(true)
-                            .open(params_filename)
+                            .open(in_params_filename)
                             .expect("unable to open.");
     let mut params = phase2::MPCParameters::read(reader, true).expect("unable to read params");
 
-    println!("Contributing to {}...", params_filename);
+    println!("Contributing to {}...", in_params_filename);
     let hash = params.contribute(&mut rng);
     println!("Contribution hash: 0x{:02x}", hash.iter().format(""));
 
-    println!("Writing parameters to {}.", params_filename);
-    let mut f = File::create(params_filename).unwrap();
+    println!("Writing parameters to {}.", out_params_filename);
+    let mut f = File::create(out_params_filename).unwrap();
     params.write(&mut f).expect("failed to write updated parameters");
 }
