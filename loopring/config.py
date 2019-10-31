@@ -10,7 +10,7 @@ phase2_repo_path = "../../phase2-bn254/"
 protocol3_repo_path = "../../protocols/packages/loopring_v3/"
 
 # Do the mpc for the following circuits
-circuit_permutations = [ \
+circuits = [ \
     [0, True, [1, 2, 4]], \
     [0, False, [1, 2, 4]], \
     [1, False, [4, 8]], \
@@ -85,13 +85,13 @@ def hash_file(filename):
         return "0x" + hash.hexdigest()
 
 def get_circuits():
-    circuits = []
-    for block_permutations in circuit_permutations:
+    circuit_list = []
+    for block_permutations in circuits:
         blockType = block_permutations[0]
         onchainDataAvailability = block_permutations[1]
         for blockSize in block_permutations[2]:
-            circuits.append(Circuit(blockType, blockSize, onchainDataAvailability))
-    return circuits
+            circuit_list.append(Circuit(blockType, blockSize, onchainDataAvailability))
+    return circuit_list
 
 class Struct(object): pass
 def generate_block(circuit):

@@ -29,7 +29,7 @@ fn log_2(x: u64) -> u32 {
 }
 
 fn main() {
-    // Try to load `./transcript` from disk.
+    // Try to load `./response` from disk.
     let reader = OpenOptions::new()
                             .read(true)
                             .open("response")

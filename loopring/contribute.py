@@ -1,10 +1,14 @@
 import os
+import sys
 import subprocess
 import config
 from zipfile import ZipFile, ZIP_DEFLATED
 
-def mpc_contribute(params_file, entropy, logfile):
-    subprocess.check_call([config.phase2_repo_path + "phase2/target/release/contribute", params_file, entropy, params_file], stdout=logfile)
+def mpc_contribute(params_file, entropy, logfile, contribute_beacon):
+    if contribute_beacon:
+        subprocess.check_call([config.phase2_repo_path + "phase2/target/release/beacon", params_file, params_file], stdout=logfile)
+    else:
+        subprocess.check_call([config.phase2_repo_path + "phase2/target/release/contribute", params_file, entropy, params_file], stdout=logfile)
 
 def print_and_log(logfile, text):
     print(text)
@@ -12,9 +16,16 @@ def print_and_log(logfile, text):
     logfile.flush()
 
 if __name__ == "__main__":
+    contribute_beacon = False
+    if len(sys.argv) == 2:
+        contribute_beacon = (sys.argv[1] == "beacon")
+
     circuits = config.get_circuits()
     print("Contributing to " + str(len(circuits)) + " circuits.")
-    entropy = input("Type some random text and press [ENTER] to provide additional entropy...\n")
+    if contribute_beacon:
+        entropy = ""
+    else:
+        entropy = input("Type some random text and press [ENTER] to provide additional entropy...\n")
 
     index = config.find_latest_contribution_index()
 
@@ -25,6 +36,9 @@ if __name__ == "__main__":
     attestation.write("[Feel free to share anything you'd like here]\n\n\n\n\n\n\n")
     attestation.write("!!!Don't modify anything from this point on!!!\n")
     attestation.write("----------------------------------------------\n")
+
+    if contribute_beacon:
+        print_and_log(attestation, "Contributing the beacon!")
 
     # calculate the hash of the contribution we start from
     start_hash = config.hash_file(start_contribution)
@@ -39,7 +53,7 @@ if __name__ == "__main__":
                 # extract the params file from the downloaded file
                 from_file.extract(os.path.basename(params), os.path.dirname(params))
                 # contribute
-                mpc_contribute(params, entropy, attestation)
+                mpc_contribute(params, entropy, attestation, contribute_beacon)
                 # add it to the new zip file
                 to_file.write(params, os.path.basename(params))
                 # delete the file
