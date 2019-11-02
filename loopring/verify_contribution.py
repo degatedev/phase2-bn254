@@ -21,8 +21,8 @@ if __name__ == "__main__":
     # calculate the hash of the contribution we start from
     new_hash = config.hash_file(new_contribution)
     previous_hash = config.hash_file(previous_contribution)
-    print("sha256 hash of contribution:          " + str(new_hash))
-    print("sha256 hash of previous contribution: " + str(previous_hash))
+    print("SHA256 hash of contribution:          " + str(new_hash))
+    print("SHA256 hash of previous contribution: " + str(previous_hash))
 
     with ZipFile(new_contribution, 'r') as new_file, ZipFile(previous_contribution, 'r') as previous_file:
         circuits = config.get_circuits()

@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     # calculate the hash of the file
     hash = config.hash_file(config.get_zip_filename(index))
-    print("sha256 hash of contribution: " + str(hash))
+    print("SHA256 hash of contribution: " + str(hash))
 
     with ZipFile(config.get_zip_filename(index), 'r') as zip_file:
         circuits = config.get_circuits()

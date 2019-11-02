@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import config
+import time
 from zipfile import ZipFile, ZIP_DEFLATED
 
 def mpc_contribute(params_file, entropy, logfile, contribute_beacon):
@@ -42,8 +43,9 @@ if __name__ == "__main__":
 
     # calculate the hash of the contribution we start from
     start_hash = config.hash_file(start_contribution)
-    print_and_log(attestation, "\nStarting from contribution " + str(index) + " with sha256 hash " + str(start_hash) + " (please check if this is correct)\n")
+    print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (please check if this is correct)\n")
 
+    start = time.time()
     try:
         with ZipFile(start_contribution, 'r') as from_file, ZipFile(new_contribution, 'w', ZIP_DEFLATED) as to_file:
             for idx, circuit in enumerate(circuits):
@@ -69,8 +71,11 @@ if __name__ == "__main__":
     end_hash = config.hash_file(new_contribution)
 
     print_and_log(attestation, "\nDone! Thank you for contributing as participant " + str(index+1) + "!")
-    print_and_log(attestation, "Your contribution has sha256 hash " + str(end_hash))
+    print_and_log(attestation, "Your contribution has SHA256 hash " + str(end_hash))
     print_and_log(attestation, "Please upload '" + new_contribution + "'.")
     print_and_log(attestation, "Also please fill out 'attestation.txt' and sign it by running 'python3 sign_attestation.py' and send us 'signed_attestation.txt'.")
+
+    end = time.time()
+    print_and_log(attestation, "Contributing took " + str(end - start) + " seconds.")
 
     attestation.close()

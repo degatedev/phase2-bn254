@@ -446,8 +446,8 @@ impl MPCParameters {
             m *= 2;
             exp += 1;
 
-            // Powers of Tau ceremony can't support more than 2^21
-            if exp > 21 {
+            // Powers of Tau ceremony can't support more than 2^28
+            if exp > 28 {
                 return Err(SynthesisError::PolynomialDegreeTooLarge)
             }
         }

@@ -1,6 +1,7 @@
 import os
 import subprocess
 import config
+import time
 from zipfile import ZipFile, ZIP_DEFLATED
 
 def mpc_setup(circuit):
@@ -12,6 +13,7 @@ def mpc_setup(circuit):
     return params
 
 if __name__ == "__main__":
+    start = time.time()
     with ZipFile(config.get_zip_filename(0), 'w', ZIP_DEFLATED) as zip_file:
         circuits = config.get_circuits()
         for idx, circuit in enumerate(circuits):
@@ -31,4 +33,7 @@ if __name__ == "__main__":
 
     # calculate the hash of the file
     hash = config.hash_file(config.get_zip_filename(0))
-    print("sha256 hash of the contribution is: " + str(hash))
+    print("SHA256 hash of the contribution is: " + str(hash))
+
+    end = time.time()
+    print("Setup took " + str(end - start) + " seconds.")
