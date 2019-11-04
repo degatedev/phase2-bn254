@@ -1,0 +1,33 @@
+Attestation to contribution <NNNN>
+================================
+
+PLEASE UPDATE THIS SECTION WHERE NEEDED (EVERYTHING BETWEEN <>)
+
+**Name:**
+<Brecht Devos>
+
+**Date:**
+<15-17 November 2019>
+
+**Location:**
+<Belgium>
+
+**Device:**
+<Dell XPS - 4 core i7 1.8GHz - 16GB RAM - Ubuntu 18.04 LTS>
+
+**Entropy sources:**
+<Key mashing, bitcoin hashes>
+
+**Side channel defences:**
+<None>
+
+**Postprocessing:**
+<
+- I added my contribution details to `attestion.txt`
+- I signed my contribution using `python3 sign_attestation.py`
+- I uploaded `loopring_mpc_NNNN.zip` and `signed_attestation.txt` to the server using the `sftp` CLI tool.
+- I rebooted my machine.
+>
+
+**Misc notes:**
+<None>

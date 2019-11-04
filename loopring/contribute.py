@@ -34,8 +34,11 @@ if __name__ == "__main__":
     new_contribution = config.get_zip_filename(index+1)
 
     attestation = open("attestation.txt", "w")
-    attestation.write("[Feel free to share anything you'd like here]\n\n\n\n\n\n\n")
-    attestation.write("!!!Don't modify anything from this point on!!!\n")
+
+    with open('template_contribution_details.txt') as f:
+        contribution_details_template = f.read()
+        attestation.write(contribution_details_template)
+    attestation.write("\n\n!!!Don't modify anything from this point on!!!\n")
     attestation.write("----------------------------------------------\n")
 
     if contribute_beacon:
