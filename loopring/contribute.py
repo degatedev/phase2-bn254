@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import subprocess
 import config
 import time
@@ -65,10 +66,13 @@ if __name__ == "__main__":
                 os.remove(params)
                 # delete the empty params folder
                 os.rmdir(os.path.dirname(params))
-    except:
+    except Exception as e:
+        print(e)
         print_and_log(attestation, "\nAn error occured while contributing! Please try again!\n")
         os.remove(new_contribution)
-        pass
+        params = config.get_params_filename(circuits[0])
+        shutil.rmtree(os.path.dirname(params))
+        exit(1)
 
     # calculate the hash of the contribution we start from
     end_hash = config.hash_file(new_contribution)
