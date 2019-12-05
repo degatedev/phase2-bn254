@@ -31,7 +31,7 @@ const CHECK_INPUT_CORRECTNESS: CheckForCorrectness = CheckForCorrectness::No;
 fn main() {
     println!("Will contribute a random beacon to accumulator for 2^{} powers of tau", Bn256CeremonyParameters::REQUIRED_POWER);
     println!("In total will generate up to {} powers", Bn256CeremonyParameters::TAU_POWERS_G1_LENGTH);
-
+    
     // Create an RNG based on the outcome of the random beacon
     let mut rng = {
         use byteorder::{ReadBytesExt, BigEndian};
@@ -124,7 +124,7 @@ fn main() {
     writer.set_len(required_output_length as u64).expect("must make output file large enough");
 
     let mut writable_map = unsafe { MmapOptions::new().map_mut(&writer).expect("unable to create a memory map for output") };
-
+    
     println!("Calculating previous contribution hash...");
 
     let current_accumulator_hash = BachedAccumulator::<Bn256, Bn256CeremonyParameters>::calculate_hash(&readable_map);
@@ -155,11 +155,11 @@ fn main() {
 
     // this computes a transformation and writes it
     BachedAccumulator::<Bn256, Bn256CeremonyParameters>::transform(
-        &readable_map,
-        &mut writable_map,
-        INPUT_IS_COMPRESSED,
-        COMPRESS_THE_OUTPUT,
-        CHECK_INPUT_CORRECTNESS,
+        &readable_map, 
+        &mut writable_map, 
+        INPUT_IS_COMPRESSED, 
+        COMPRESS_THE_OUTPUT, 
+        CHECK_INPUT_CORRECTNESS, 
         &privkey
     ).expect("must transform with the key");
     println!("Finihsing writing your contribution to `./response`...");
