@@ -24,16 +24,29 @@ const CONTRIBUTION_IS_COMPRESSED: UseCompression = UseCompression::Yes;
 const COMPRESS_NEW_CHALLENGE: UseCompression = UseCompression::No;
 
 fn main() {
-    let mut verify = true;
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() == 2 {
-        if &args[1] == "-skipverification" {
-            verify = false;
-            println!("!!!Skipping verification!!!");
+    println!("Will verify and decompress a contribution to accumulator for 2^{} powers of tau", Bn256CeremonyParameters::REQUIRED_POWER);
+    
+    // Try to load `./challenge` from disk.
+    let challenge_reader = OpenOptions::new()
+                            .read(true)
+                            .open("challenge").expect("unable open `./challenge` in this directory");
+
+    {
+        let metadata = challenge_reader.metadata().expect("unable to get filesystem metadata for `./challenge`");
+        let expected_challenge_length = match PREVIOUS_CHALLENGE_IS_COMPRESSED {
+            UseCompression::Yes => {
+                Bn256CeremonyParameters::CONTRIBUTION_BYTE_SIZE - Bn256CeremonyParameters::PUBLIC_KEY_SIZE
+            },
+            UseCompression::No => {
+                Bn256CeremonyParameters::ACCUMULATOR_BYTE_SIZE
+            }
+        };
+        if metadata.len() != (expected_challenge_length as u64) {
+            panic!("The size of `./challenge` should be {}, but it's {}, so something isn't right.", expected_challenge_length, metadata.len());
         }
     }
 
-    println!("Will verify and decompress a contribution to accumulator for 2^{} powers of tau", Bn256CeremonyParameters::REQUIRED_POWER);
+    let challenge_readable_map = unsafe { MmapOptions::new().map(&challenge_reader).expect("unable to create a memory map for input") };
 
     // Try to load `./response` from disk.
     let response_reader = OpenOptions::new()
@@ -44,7 +57,7 @@ fn main() {
         let metadata = response_reader.metadata().expect("unable to get filesystem metadata for `./response`");
         let expected_response_length = match CONTRIBUTION_IS_COMPRESSED {
             UseCompression::Yes => {
-                Bn256CeremonyParameters::CONTRIBUTION_BYTE_SIZE
+                Bn256CeremonyParameters::CONTRIBUTION_BYTE_SIZE 
             },
             UseCompression::No => {
                 Bn256CeremonyParameters::ACCUMULATOR_BYTE_SIZE + Bn256CeremonyParameters::PUBLIC_KEY_SIZE
@@ -56,6 +69,47 @@ fn main() {
     }
 
     let response_readable_map = unsafe { MmapOptions::new().map(&response_reader).expect("unable to create a memory map for input") };
+
+    println!("Calculating previous challenge hash...");
+
+    // Check that contribution is correct
+
+    let current_accumulator_hash = BachedAccumulator::<Bn256, Bn256CeremonyParameters>::calculate_hash(&challenge_readable_map);
+
+    println!("Hash of the `challenge` file for verification:");
+    for line in current_accumulator_hash.as_slice().chunks(16) {
+        print!("\t");
+        for section in line.chunks(4) {
+            for b in section {
+                print!("{:02x}", b);
+            }
+            print!(" ");
+        }
+        println!("");
+    }
+
+    // Check the hash chain - a new response must be based on the previous challenge!
+    {
+        let mut response_challenge_hash = [0; 64];
+        let memory_slice = response_readable_map.get(0..64).expect("must read point data from file");
+        memory_slice.clone().read_exact(&mut response_challenge_hash).expect("couldn't read hash of challenge file from response file");
+
+        println!("`response` was based on the hash:");
+        for line in response_challenge_hash.chunks(16) {
+            print!("\t");
+            for section in line.chunks(4) {
+                for b in section {
+                    print!("{:02x}", b);
+                }
+                print!(" ");
+            }
+            println!("");
+        }
+
+        if &response_challenge_hash[..] != current_accumulator_hash.as_slice() {
+            panic!("Hash chain failure. This is not the right response.");
+        }
+    }
 
     let response_hash = BachedAccumulator::<Bn256, Bn256CeremonyParameters>::calculate_hash(&response_readable_map);
 
@@ -75,89 +129,27 @@ fn main() {
     let public_key = PublicKey::<Bn256>::read::<Bn256CeremonyParameters>(&response_readable_map, CONTRIBUTION_IS_COMPRESSED)
                                            .expect("wasn't able to deserialize the response file's public key");
 
-    if verify {
-        // Try to load `./challenge` from disk.
-        let challenge_reader = OpenOptions::new()
-                                .read(true)
-                                .open("challenge").expect("unable open `./challenge` in this directory");
 
-        let metadata = challenge_reader.metadata().expect("unable to get filesystem metadata for `./challenge`");
-        let expected_challenge_length = match PREVIOUS_CHALLENGE_IS_COMPRESSED {
-            UseCompression::Yes => {
-                Bn256CeremonyParameters::CONTRIBUTION_BYTE_SIZE - Bn256CeremonyParameters::PUBLIC_KEY_SIZE
-            },
-            UseCompression::No => {
-                Bn256CeremonyParameters::ACCUMULATOR_BYTE_SIZE
-            }
-        };
-        if metadata.len() != (expected_challenge_length as u64) {
-            panic!("The size of `./challenge` should be {}, but it's {}, so something isn't right.", expected_challenge_length, metadata.len());
-        }
+    // check that it follows the protocol
 
-        let challenge_readable_map = unsafe { MmapOptions::new().map(&challenge_reader).expect("unable to create a memory map for input") };
+    println!("Verifying a contribution to contain proper powers and correspond to the public key...");
 
-        println!("Calculating previous challenge hash...");
+    let valid = BachedAccumulator::<Bn256, Bn256CeremonyParameters>::verify_transformation(
+        &challenge_readable_map,
+        &response_readable_map,
+        &public_key, 
+        current_accumulator_hash.as_slice(),
+        PREVIOUS_CHALLENGE_IS_COMPRESSED,
+        CONTRIBUTION_IS_COMPRESSED,
+        CheckForCorrectness::No,
+        CheckForCorrectness::Yes,
+    );
 
-        // Check that contribution is correct
-
-        let current_accumulator_hash = BachedAccumulator::<Bn256, Bn256CeremonyParameters>::calculate_hash(&challenge_readable_map);
-
-        println!("Hash of the `challenge` file for verification:");
-        for line in current_accumulator_hash.as_slice().chunks(16) {
-            print!("\t");
-            for section in line.chunks(4) {
-                for b in section {
-                    print!("{:02x}", b);
-                }
-                print!(" ");
-            }
-            println!("");
-        }
-
-        // Check the hash chain - a new response must be based on the previous challenge!
-        {
-            let mut response_challenge_hash = [0; 64];
-            let memory_slice = response_readable_map.get(0..64).expect("must read point data from file");
-            memory_slice.clone().read_exact(&mut response_challenge_hash).expect("couldn't read hash of challenge file from response file");
-
-            println!("`response` was based on the hash:");
-            for line in response_challenge_hash.chunks(16) {
-                print!("\t");
-                for section in line.chunks(4) {
-                    for b in section {
-                        print!("{:02x}", b);
-                    }
-                    print!(" ");
-                }
-                println!("");
-            }
-
-            if &response_challenge_hash[..] != current_accumulator_hash.as_slice() {
-                panic!("Hash chain failure. This is not the right response.");
-            }
-        }
-
-        // check that it follows the protocol
-
-        println!("Verifying a contribution to contain proper powers and correspond to the public key...");
-
-        let valid = BachedAccumulator::<Bn256, Bn256CeremonyParameters>::verify_transformation(
-            &challenge_readable_map,
-            &response_readable_map,
-            &public_key,
-            current_accumulator_hash.as_slice(),
-            PREVIOUS_CHALLENGE_IS_COMPRESSED,
-            CONTRIBUTION_IS_COMPRESSED,
-            CheckForCorrectness::No,
-            CheckForCorrectness::Yes,
-        );
-
-        if !valid {
-            println!("Verification failed, contribution was invalid somehow.");
-            panic!("INVALID CONTRIBUTION!!!");
-        } else {
-            println!("Verification succeeded!");
-        }
+    if !valid {
+        println!("Verification failed, contribution was invalid somehow.");
+        panic!("INVALID CONTRIBUTION!!!");
+    } else {
+        println!("Verification succeeded!");
     }
 
     if COMPRESS_NEW_CHALLENGE == UseCompression::Yes {
@@ -189,7 +181,7 @@ fn main() {
             &response_readable_map,
             &mut writable_map,
             CheckForCorrectness::No).expect("must decompress a response for a new challenge");
-
+        
         writable_map.flush().expect("must flush the memory map");
 
         let new_challenge_readable_map = writable_map.make_read_only().expect("must make a map readonly");

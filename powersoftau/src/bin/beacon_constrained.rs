@@ -31,7 +31,7 @@ const CHECK_INPUT_CORRECTNESS: CheckForCorrectness = CheckForCorrectness::No;
 fn main() {
     println!("Will contribute a random beacon to accumulator for 2^{} powers of tau", Bn256CeremonyParameters::REQUIRED_POWER);
     println!("In total will generate up to {} powers", Bn256CeremonyParameters::TAU_POWERS_G1_LENGTH);
-    
+
     // Create an RNG based on the outcome of the random beacon
     let mut rng = {
         use byteorder::{ReadBytesExt, BigEndian};
@@ -40,8 +40,8 @@ fn main() {
         use crypto::sha2::Sha256;
         use crypto::digest::Digest;
 
-        // Place block hash here (block number #602168)
-        let mut cur_hash: [u8; 32] = hex!("00000000000000000013a0dab9d26be0353108f6eb5a2be6ac389986296607c7");
+        // Place block hash here (block number #564321)
+        let mut cur_hash: [u8; 32] = hex!("0000000000000000000a558a61ddc8ee4e488d647a747fe4dcc362fe2026c620");
 
         // Performs 2^n hash iterations over it
         const N: usize = 10;
@@ -124,7 +124,7 @@ fn main() {
     writer.set_len(required_output_length as u64).expect("must make output file large enough");
 
     let mut writable_map = unsafe { MmapOptions::new().map_mut(&writer).expect("unable to create a memory map for output") };
-    
+
     println!("Calculating previous contribution hash...");
 
     let current_accumulator_hash = BachedAccumulator::<Bn256, Bn256CeremonyParameters>::calculate_hash(&readable_map);
@@ -155,11 +155,11 @@ fn main() {
 
     // this computes a transformation and writes it
     BachedAccumulator::<Bn256, Bn256CeremonyParameters>::transform(
-        &readable_map, 
-        &mut writable_map, 
-        INPUT_IS_COMPRESSED, 
-        COMPRESS_THE_OUTPUT, 
-        CHECK_INPUT_CORRECTNESS, 
+        &readable_map,
+        &mut writable_map,
+        INPUT_IS_COMPRESSED,
+        COMPRESS_THE_OUTPUT,
+        CHECK_INPUT_CORRECTNESS,
         &privkey
     ).expect("must transform with the key");
     println!("Finihsing writing your contribution to `./response`...");
