@@ -11,12 +11,7 @@ protocol3_repo_path = "../../protocols/packages/loopring_v3/"
 
 # Do the mpc for the following circuits
 circuits = [ \
-    [0, True, [1, 2, 4, 8, 14, 31, 63, 128, 256, 512, 1024]], \
-    [1, False, [1, 2, 4, 8, 15, 31, 64, 128, 256]], \
-    [2, False, [1, 2, 4, 8, 16, 32, 64, 128, 256]], \
-    [3, True, [1, 2, 4, 8, 16, 32, 64, 128, 256]], \
-    [4, True, [1, 2, 4, 8, 16, 32, 64, 128, 256]], \
-    [5, True, [1, 2, 4, 8, 28, 58, 120, 243]], \
+    [0, False, [16, 64, 128, 192, 256, 320, 384, 448, 512]], \
 ]
 
 # Set this to the folder containing the phase2 repo
@@ -32,7 +27,7 @@ def str_da(onchainDataAvailability):
     return "_DA_" if onchainDataAvailability else "_"
 
 def base_name(circuit):
-    str_block_types = ["trade", "deposit", "withdraw_onchain", "withdraw_offchain", "cancel", "internal_transfer"]
+    str_block_types = ["all"]
     return str_block_types[circuit.blockType] + str_da(circuit.onchainDataAvailability) + str(circuit.blockSize)
 
 def get_block_filename(circuit):
