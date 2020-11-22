@@ -24,7 +24,7 @@ class Circuit(object):
         self.onchainDataAvailability = onchainDataAvailability
 
 def str_da(onchainDataAvailability):
-    return "_DA_" if onchainDataAvailability else "_"
+    return "_"
 
 def base_name(circuit):
     str_block_types = ["all"]

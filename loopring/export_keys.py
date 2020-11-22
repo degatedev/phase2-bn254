@@ -23,7 +23,7 @@ def mpc_export_keys(circuit):
     # pk
     pk = config.get_pk_filename(circuit)
     block = config.generate_block(circuit)
-    subprocess.check_call([config.circuit_executable, "-createpk", block, bellman_pk, pk])
+    subprocess.check_call([config.circuit_executable, "-createpk", bellman_pk, pk])
 
     # remove files
     os.remove(bellman_vk)
