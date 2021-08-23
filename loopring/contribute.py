@@ -24,10 +24,12 @@ if __name__ == "__main__":
 
     circuits = config.get_circuits()
     print("Contributing to " + str(len(circuits)) + " circuits.")
-    if contribute_beacon:
-        entropy = ""
-    else:
-        entropy = input("Type some random text and press [ENTER] to provide additional entropy...\n")
+    # if contribute_beacon:
+    #     entropy = ""
+    # else:
+    #     entropy = input("Type some random text and press [ENTER] to provide additional entropy...\n")
+
+    entropy = "0x64fbe5c786fe39afce140ce63f958429b804403d8951ac42ce99eedbb13078ec"
 
     index = config.find_latest_contribution_index()
 
