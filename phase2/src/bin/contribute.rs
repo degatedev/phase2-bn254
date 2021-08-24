@@ -37,12 +37,12 @@ fn main() {
             // Gather 1024 bytes of entropy from the system
             for _ in 0..1024 {
                 let r: u8 = system_rng.gen();
-                h.input(&[r]);
+                h.update(&[r]);
             }
 
             // Hash it all up to make a seed
-            h.input(&entropy.as_bytes());
-            h.result()
+            h.update(&entropy.as_bytes());
+            h.finalize()
         };
 
         let mut digest = &h[..];

@@ -1,0 +1,8 @@
+phase1radix*
+__pycache__/
+nohup.out
+sftp-2020.credential
+blocks/
+circuits/
+*.zip
+params
