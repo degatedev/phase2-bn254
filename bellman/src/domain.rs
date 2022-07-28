@@ -63,7 +63,8 @@ impl<E: Engine, G: Group<E>> EvaluationDomain<E, G> {
         let mut omega = E::Fr::root_of_unity();
         let max_degree = (1 << E::Fr::S) - 1;
 
-        if coeffs_len > max_degree {
+        // There is a plonk legacy issue in bellman Community edition code. For Groth16, this can be extended to support 2^28 circuits
+        if coeffs_len > max_degree+1 {
             return Err(SynthesisError::PolynomialDegreeTooLarge)
         }
 

@@ -27,7 +27,7 @@ if __name__ == "__main__":
     if contribute_beacon:
         entropy = ""
     else:
-        entropy = input("Type some random text and press [ENTER] to provide additional entropy...\n")
+        entropy = sys.argv[2]
 
     index = config.find_latest_contribution_index()
 
@@ -47,7 +47,13 @@ if __name__ == "__main__":
 
     # calculate the hash of the contribution we start from
     start_hash = config.hash_file(start_contribution)
-    print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (please check if this is correct)\n")
+    if sys.argv[1] == "beacon":
+        print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (please check if this is correct)\n")
+    elif sys.argv[1] == start_hash:
+        print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is correct)\n")
+    else:
+        print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is incorrect,please contact the coordinator)\n")
+        os._exit(1)
 
     start = time.time()
     try:

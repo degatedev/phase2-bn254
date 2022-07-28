@@ -11,7 +11,7 @@ protocol3_repo_path = "../../protocols/packages/loopring_v3/"
 
 # Do the mpc for the following circuits
 circuits = [ \
-    [0, False, [16, 32, 64, 128, 256, 384]], \
+    [0, False, [5,10,20,42,85,170,320]], \
 ]
 
 # Set this to the folder containing the phase2 repo
