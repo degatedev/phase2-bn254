@@ -47,12 +47,18 @@ if __name__ == "__main__":
 
     # calculate the hash of the contribution we start from
     start_hash = config.hash_file(start_contribution)
+
+    # add log to trusted-setup.log
+    trustedlog = open("/opt/trustmount/trusted-setup.log", "a")
+    time_to_trustedlog = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
     if sys.argv[1] == "beacon":
         print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (please check if this is correct)\n")
     elif sys.argv[1] == start_hash:
-        print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is correct)\n")
+        print_and_log(trustedlog, time_to_trustedlog + " Starting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is correct), this process takes a long time, about 20 hours")
     else:
-        print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is incorrect,please contact the coordinator)\n")
+        print_and_log(trustedlog, time_to_trustedlog +  " Starting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is incorrect, please contact the coordinator)")
+        trustedlog.close()
         os._exit(1)
 
     start = time.time()
@@ -86,9 +92,10 @@ if __name__ == "__main__":
     print_and_log(attestation, "\nDone! Thank you for contributing as participant " + str(index+1) + "!")
     print_and_log(attestation, "Your contribution has SHA256 hash " + str(end_hash))
     print_and_log(attestation, "Please upload '" + new_contribution + "'.")
-    print_and_log(attestation, "Also please fill out 'attestation.txt' and sign it by running 'python3 sign_attestation.py' and send us 'signed_attestation.txt'.")
+    print_and_log(attestation, "Also please fill out 'attestation.txt' and sign it by running 'keybase pgp sign --clearsign -i attestation.txt -o signed_attestation.txt' and send us 'signed_attestation.txt'.")
 
     end = time.time()
     print_and_log(attestation, "Contributing took " + str(end - start) + " seconds.")
 
     attestation.close()
+    trustedlog.close()
