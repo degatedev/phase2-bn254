@@ -17,6 +17,10 @@ def print_and_log(logfile, text):
     logfile.write(text + "\n")
     logfile.flush()
 
+def print_log(logfile, text):
+    logfile.write(text + "\n")
+    logfile.flush()
+
 if __name__ == "__main__":
     contribute_beacon = False
     if len(sys.argv) == 2:
@@ -55,9 +59,9 @@ if __name__ == "__main__":
     if sys.argv[1] == "beacon":
         print_and_log(attestation, "\nStarting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (please check if this is correct)\n")
     elif sys.argv[1] == start_hash:
-        print_and_log(trustedlog, time_to_trustedlog + " Starting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is correct), this process takes a long time, about 20 hours")
+        print_log(trustedlog, time_to_trustedlog + " Starting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is correct, this process takes a long time, about 20 hours)")
     else:
-        print_and_log(trustedlog, time_to_trustedlog +  " Starting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is incorrect, please contact the coordinator)")
+        print_log(trustedlog, time_to_trustedlog +  " Starting from contribution " + str(index) + " with SHA256 hash " + str(start_hash) + " (check result is incorrect, please contact the coordinator)")
         trustedlog.close()
         os._exit(1)
 
