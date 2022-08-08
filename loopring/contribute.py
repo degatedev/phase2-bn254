@@ -96,7 +96,7 @@ if __name__ == "__main__":
     print_and_log(attestation, "\nDone! Thank you for contributing as participant " + str(index+1) + "!")
     print_and_log(attestation, "Your contribution has SHA256 hash " + str(end_hash))
     print_and_log(attestation, "Please upload '" + new_contribution + "'.")
-    print_and_log(attestation, "Also please fill out 'attestation.txt' and sign it by running 'keybase pgp sign --clearsign -i attestation.txt -o signed_attestation.txt' and send us 'signed_attestation.txt'.")
+    print_and_log(attestation, "Also please download and fill out 'attestation.txt' on local your Mac and sign it by running 'keybase pgp sign --clearsign -i attestation.txt -o signed_attestation.txt' and send us 'signed_attestation.txt'.")
 
     end = time.time()
     print_and_log(attestation, "Contributing took " + str(end - start) + " seconds.")
