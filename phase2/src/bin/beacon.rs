@@ -35,7 +35,7 @@ fn main() {
         use crypto::digest::Digest;
 
         // Place block hash here (block number #564321)
-        let mut cur_hash: [u8; 32] = hex!("0000000000000000000a558a61ddc8ee4e488d647a747fe4dcc362fe2026c620");
+        let mut cur_hash: [u8; 32] = hex!("00000000000000000007bbba75a0fbda0621610799618c7a7d28a14995f1b836");
 
         // Performs 2^n hash iterations over it
         const N: usize = 10;
