@@ -40,8 +40,8 @@ fn main() {
         use crypto::sha2::Sha256;
         use crypto::digest::Digest;
 
-        // Place block hash here (block number #779277)
-        let mut cur_hash: [u8; 32] = hex!("00000000000000000004e1c194d2a386a50299481b1ce5f431ecd9582b49076e");
+        // Place block hash here (block number #796339)
+        let mut cur_hash: [u8; 32] = hex!("0000000000000000000376a278ec275fdeaf4dd0a129207a8d932a4dbb75a9b5");
 
         // Performs 2^n hash iterations over it
         const N: usize = 10;
